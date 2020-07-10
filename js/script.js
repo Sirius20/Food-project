@@ -41,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Timer
 
-    const deadLine = '2020-07-11';
+    const deadLine = '2020-08-11';
 
     function getTimeRemaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -92,4 +92,38 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     setClock('.timer', deadLine);
+
+    //Modal
+
+    const modalButton = document.querySelectorAll('[data-modal]'),
+          modal = document.querySelector('.modal'),
+          modalClose = modal.querySelector('[data-close]');
+
+    modalButton.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modal.classList.toggle('show');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    function closeModal() {
+       modal.classList.toggle('show');
+        document.body.style.overflow = ''; 
+    }
+
+    modalClose.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (evt) => {
+        if (evt.code === 'Escape' && modal.classList.contains('show')) {
+            closeModal();
+        }
+    });
+
+    modal.addEventListener('click', (evt) => {
+        if (evt.target === modal) {
+            closeModal();
+        }
+    });
+
+
 });
