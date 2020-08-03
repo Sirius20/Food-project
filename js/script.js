@@ -97,8 +97,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const modalButton = document.querySelectorAll('[data-modal]'),
           modal = document.querySelector('.modal'),
-          modalClose = modal.querySelector('[data-close]');
-        //   modalTimerId = setTimeout(openModal, 5000);
+          modalClose = modal.querySelector('[data-close]'),
+          modalTimerId = setTimeout(openModal, 5000);
 
     function openModal() {
         modal.classList.toggle('show');
@@ -211,4 +211,49 @@ window.addEventListener('DOMContentLoaded', () => {
         "menu__item"
     ).render();
 
+
+    // Forms
+
+    const forms = document.querySelectorAll('form');
+    
+    const messages = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Скоро мы  с Вами свяжемся',
+        failure: 'Ошибка! Что-то пошло не так',
+
+    }
+
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (evt) => {
+            evt.preventDefault();
+
+            const statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = messages.loading;
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+
+            request.open('POST', 'server.php');
+
+            request.setRequestHeader('Content-type', 'multipart/form-data');
+
+            const formData = new FormData(form); 
+
+            request.send(formData);
+
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = messages.success;
+                } else {
+                    statusMessage.textContent = messages.failure;
+                }
+            })
+        });
+    };
 });
