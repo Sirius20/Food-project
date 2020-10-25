@@ -245,7 +245,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 object[key] = value;
             });
     
-            fetch('server1.php', {
+            fetch('server.php', {
                 method: "POST",
                 body: JSON.stringify(object),
                 headers: {'Content-type': 'application/json'},
@@ -288,4 +288,8 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }, 4000);
     }
+
+    fetch('db.JSON')
+        .then(data => data.json())
+        .then(res => console.log(res));
 });

@@ -1,0 +1,22 @@
+{
+  "name": "food-project",
+  "version": "1.0.0",
+  "description": "Проект на javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sirius20/Food-project.git"
+  },
+  "author": "Nataly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sirius20/Food-project/issues"
+  },
+  "homepage": "https://github.com/Sirius20/Food-project#readme",
+  "devDependencies": {
+    "json-server": "^0.16.2"
+  }
+}
