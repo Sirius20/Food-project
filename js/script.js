@@ -41,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Timer
 
-    const deadLine = '2020-12-11';
+    const deadLine = '2021-01-31';
 
     function getTimeRemaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -167,27 +167,27 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         
             element.innerHTML = `
-                    <img src=${this.src} alt=${this.alt}>
-                    <h3 class="menu__item-subtitle">${this.title}</h3>
-                    <div class="menu__item-descr">${this.description}</div>
-                    <div class="menu__item-divider"></div>
-                    <div class="menu__item-price">
-                        <div class="menu__item-cost">Цена:</div>
-                        <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
-                    </div>`;
+                <img src=${this.src} alt=${this.alt}>
+                <h3 class="menu__item-subtitle">${this.title}</h3>
+                <div class="menu__item-descr">${this.description}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+                </div>`;
             this.parent.append(element);
         }
     }
 
-    const getResource = async (url) => {
-        const res = await fetch(url);
+    // const getResource = async (url) => {
+    //     const res = await fetch(url);
 
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-        }
+    //     if (!res.ok) {
+    //         throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    //     }
 
-        return await res.json();
-    };
+    //     return await res.json();
+    // };
 
     axios.get('http://localhost:3000/menu')
         .then(data => {
@@ -332,6 +332,10 @@ window.addEventListener('DOMContentLoaded', () => {
         dots[slideIndex - 1].style.opacity = 1;
     }
 
+    function delNotDig(par) {
+        return +par.replace(/\D/g, '');
+    }
+
     slidesField.style.width = 100 * slides.length + '%';
     slides.forEach(slide => {
         slide.style.width = width;
@@ -339,9 +343,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     backArrow.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, -2) * (slides.length - 1);
+            offset = delNotDig(width) * (slides.length - 1);
         } else {
-            offset -= +width.slice(0, -2);
+            offset -= delNotDig(width);
         }
         slidesField.style.transform = `translateX(-${offset}px)`;
 
@@ -355,10 +359,10 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     nextArrow.addEventListener('click', () => {
-        if (offset == +width.slice(0, -2) * (slides.length - 1)) {
+        if (offset == delNotDig(width) * (slides.length - 1)) {
             offset = 0;
         } else {
-            offset += +width.slice(0, -2);
+            offset += delNotDig(width);
         }
         slidesField.style.transform = `translateX(-${offset}px)`;
 
@@ -377,7 +381,7 @@ window.addEventListener('DOMContentLoaded', () => {
         dot.addEventListener('click', (e) => {
             const slideTo = e.target.getAttribute('data-id');
             slideIndex = slideTo;
-            offset = +width.slice(0, -2) * (slideTo - 1);
+            offset = delNotDig(width) * (slideTo - 1);
 
             slidesField.style.transform = `translateX(-${offset}px)`;
 
@@ -385,4 +389,110 @@ window.addEventListener('DOMContentLoaded', () => {
             dotActivision();
         });
     });
+
+    // calculator
+
+    const result = document.querySelector('.calculating__result span');
+
+    let sex, height, weight, age, ratio;
+    
+    if (localStorage.getItem('sex')) {
+        sex = localStorage.getItem('sex');
+    } else {
+        sex = 'female';
+        localStorage.setItem('sex', 'female');
+    }
+
+    if (localStorage.getItem('ratio')) {
+        ratio = localStorage.getItem('ratio');
+    } else {
+        ratio = 1.375;
+        localStorage.setItem('ratio', 1.375);
+    }
+    
+    function initLocalSettings(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach(elem => {
+            elem.classList.remove(activeClass);
+            if (elem.getAttribute('id') === localStorage.getItem('sex')) {
+                elem.classList.add(activeClass);
+            }
+            if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+                elem.classList.add(activeClass);
+            }
+        });
+    }
+
+    function calcTotal() {
+        if(!sex || !height || !weight || !age || !ratio) {
+            result.textContent = '____';
+            return;
+        }
+
+        if (sex === 'female') {
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+        } else {
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        }
+    }
+
+    function getStaticInfo(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                if (e.target.getAttribute('data-ratio')) {
+                    ratio = +e.target.getAttribute('data-ratio');
+                    localStorage.setItem('ratio', +e.target.getAttribute('data-ratio'));
+                } else {
+                    sex = e.target.getAttribute('id');
+                    localStorage.setItem('sex', e.target.getAttribute('id'));
+                }
+    
+                elements.forEach(elem => {
+                    elem.classList.remove(activeClass);
+                });
+    
+                e.target.classList.add(activeClass);
+    
+                calcTotal();
+            });
+        });
+    }
+
+    function getDynamicInfo(selector) {
+        const input = document.querySelector(selector);
+
+        input.addEventListener('input', () => {
+
+            if (input.value.match(/\D/g)) {
+                input.style.border = '1px solid red';
+            } else {
+                input.style.border = 'none';
+            }
+
+            switch(input.getAttribute('id')) {
+                case 'height':
+                    height = +input.value;
+                    break;
+                case 'weight':
+                    weight = +input.value;
+                    break;
+                case 'age':
+                    age = +input.value;
+                    break; 
+            }
+
+            calcTotal();
+        });
+    }
+    initLocalSettings('#gender div', 'calculating__choose-item_active');
+    initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active');
+    calcTotal();
+    getStaticInfo('#gender div', 'calculating__choose-item_active');
+    getStaticInfo('.calculating__choose_big div', 'calculating__choose-item_active');
+    getDynamicInfo('#height');
+    getDynamicInfo('#weight');
+    getDynamicInfo('#age');
 });
